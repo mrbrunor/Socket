@@ -1,6 +1,7 @@
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import javax.swing.JOptionPane;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -16,11 +17,14 @@ public class ChatCliente extends javax.swing.JFrame {
     
     PrintWriter escritor;
     Socket socket;
+    String nome;
 
     /**
      * Creates new form ChatCliente
      */
-    public ChatCliente() {
+    public ChatCliente(String nome) {
+        super("Chat: " + nome);
+        this.nome = nome;
         initComponents();
         configurarde();
     }
@@ -71,7 +75,7 @@ public class ChatCliente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void botaoEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoEnviarActionPerformed
-        escritor.println(campoEnviar.getText());
+        escritor.println(nome + " : " + campoEnviar.getText());
         escritor.flush();
         campoEnviar.setText("");
         campoEnviar.requestFocus();
@@ -114,7 +118,8 @@ public class ChatCliente extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ChatCliente().setVisible(true);
+                String nome = JOptionPane.showInputDialog("Digite o seu nome: ");
+                new ChatCliente(nome).setVisible(true);
             }
         });
     }

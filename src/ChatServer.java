@@ -19,15 +19,35 @@ public class ChatServer {
 
     public ChatServer() {
         ServerSocket server;
-        Scanner scan;
         try {
             server = new ServerSocket(5000);
             while (true) {
                 Socket s = server.accept();
-                scan = new Scanner(s.getInputStream());
-                System.out.println("Mensagem: " + scan.nextLine());
+                new Thread(new EscutaCliente(s)).start();
             }
-        } catch (IOException ex) {}
+        } catch (IOException ex) {
+        }
+    }
+
+    private class EscutaCliente implements Runnable {
+
+        Scanner leitor;
+
+        public EscutaCliente(Socket socket) {
+            try {
+                leitor = new Scanner(socket.getInputStream());
+            } catch (Exception e) {}
+        }
+
+        @Override
+        public void run() {
+            try {
+                String mensagem;
+                while ((mensagem = leitor.nextLine()) != null) {
+                    System.out.println("Recebeu: " + mensagem);
+                }
+            } catch (Exception ee) {}
+        }
     }
 
     public static void main(String[] args) throws Exception {
