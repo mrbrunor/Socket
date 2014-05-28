@@ -1,6 +1,7 @@
 
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 /*
@@ -8,20 +9,33 @@ import javax.swing.JOptionPane;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Administrador
  */
 public class ChatCliente extends javax.swing.JFrame {
-    
+
     PrintWriter escritor;
     Socket socket;
     String nome;
+    Scanner leitor;
 
     /**
      * Creates new form ChatCliente
      */
+    private class EscutaServidor implements Runnable {
+
+        @Override
+        public void run() {
+            try {
+                String mensagem;
+                while ((mensagem = leitor.nextLine()) != null) {
+                    textoAreaMensagens.append(mensagem + "\n");
+                }
+            } catch (Exception e) {}
+        }
+    }
+
     public ChatCliente(String nome) {
         super("Chat: " + nome);
         this.nome = nome;
@@ -40,6 +54,9 @@ public class ChatCliente extends javax.swing.JFrame {
 
         campoEnviar = new javax.swing.JTextField();
         botaoEnviar = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        textoAreaMensagens = new javax.swing.JTextArea();
+        jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -50,25 +67,41 @@ public class ChatCliente extends javax.swing.JFrame {
             }
         });
 
+        textoAreaMensagens.setColumns(20);
+        textoAreaMensagens.setRows(5);
+        jScrollPane1.setViewportView(textoAreaMensagens);
+
+        jLabel1.setText("CHAT - Com Socket - Sistemas Distribuidos");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(campoEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, 307, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(botaoEnviar)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(campoEnviar, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(botaoEnviar))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(27, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(campoEnviar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(botaoEnviar))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -81,13 +114,16 @@ public class ChatCliente extends javax.swing.JFrame {
         campoEnviar.requestFocus();
     }//GEN-LAST:event_botaoEnviarActionPerformed
 
-    private void configurarde(){
-        try{ 
-            socket = new Socket("127.0.0.1", 5000);
+    private void configurarde() {
+        try {
+            socket = new Socket("sistemapastelao.no-ip.biz", 5000);
             escritor = new PrintWriter(socket.getOutputStream());
-        } catch(Exception e){}        
+            leitor = new Scanner(socket.getInputStream());
+            new Thread(new EscutaServidor()).start();
+        } catch (Exception e) {
+        }
     }
-    
+
     /**
      * @param args the command line arguments
      */
@@ -127,5 +163,8 @@ public class ChatCliente extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoEnviar;
     private javax.swing.JTextField campoEnviar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea textoAreaMensagens;
     // End of variables declaration//GEN-END:variables
 }

@@ -1,10 +1,11 @@
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,6 +18,8 @@ import java.util.logging.Logger;
  */
 public class ChatServer {
 
+    List<PrintWriter> escritores = new ArrayList<>();
+
     public ChatServer() {
         ServerSocket server;
         try {
@@ -24,6 +27,8 @@ public class ChatServer {
             while (true) {
                 Socket s = server.accept();
                 new Thread(new EscutaCliente(s)).start();
+                PrintWriter printWriter = new PrintWriter(s.getOutputStream());
+                escritores.add(printWriter);
             }
         } catch (IOException ex) {
         }
@@ -36,7 +41,17 @@ public class ChatServer {
         public EscutaCliente(Socket socket) {
             try {
                 leitor = new Scanner(socket.getInputStream());
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
+        }
+
+        private void encaminharParaTodos(String mensagem) {
+            for (PrintWriter printWriter : escritores) {
+                try {
+                    printWriter.println(mensagem);
+                    printWriter.flush();
+                } catch (Exception e) {}
+            }
         }
 
         @Override
@@ -44,9 +59,10 @@ public class ChatServer {
             try {
                 String mensagem;
                 while ((mensagem = leitor.nextLine()) != null) {
-                    System.out.println("Recebeu: " + mensagem);
+                    encaminharParaTodos(mensagem);
                 }
-            } catch (Exception ee) {}
+            } catch (Exception ee) {
+            }
         }
     }
 
