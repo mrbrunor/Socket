@@ -40,6 +40,7 @@ public class ChatCliente extends javax.swing.JFrame {
         super("Chat: " + nome);
         this.nome = nome;
         initComponents();
+        campoEnviar.requestFocus();
         configurarde();
     }
 
@@ -59,6 +60,12 @@ public class ChatCliente extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        campoEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                campoEnviarActionPerformed(evt);
+            }
+        });
 
         botaoEnviar.setText("Enviar");
         botaoEnviar.addActionListener(new java.awt.event.ActionListener() {
@@ -113,6 +120,10 @@ public class ChatCliente extends javax.swing.JFrame {
         campoEnviar.setText("");
         campoEnviar.requestFocus();
     }//GEN-LAST:event_botaoEnviarActionPerformed
+
+    private void campoEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_campoEnviarActionPerformed
+        botaoEnviar.doClick();
+    }//GEN-LAST:event_campoEnviarActionPerformed
 
     private void configurarde() {
         try {
